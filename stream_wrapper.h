@@ -1,8 +1,9 @@
 //
-//  CRF++ -- Yet Another CRF toolkit
+//  CRF++PIVAJ -- A CRF toolkit derived from CRF++ for 
+//  the PIVAJ project (see http://plair.univ-rouen.fr).
 //
-//  $Id: stream_wrapper.h 1588 2007-02-12 09:03:39Z taku $;
 //
+//  Copyright(C) 2014 Julien Lerouge <julien@lerouge.me>
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
 #ifndef CRFPP_STREAM_WRAPPER_H_

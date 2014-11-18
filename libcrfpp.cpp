@@ -1,8 +1,9 @@
 //
-//  CRF++ -- Yet Another CRF toolkit
+//  CRF++PIVAJ -- A CRF toolkit derived from CRF++ for 
+//  the PIVAJ project (see http://plair.univ-rouen.fr).
 //
-//  $Id: libcrfpp.cpp 1587 2007-02-12 09:00:36Z taku $;
 //
+//  Copyright(C) 2014 Julien Lerouge <julien@lerouge.me>
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
 #if defined(_WIN32) && !defined(__CYGWIN__)

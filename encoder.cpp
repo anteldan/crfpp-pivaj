@@ -1,8 +1,9 @@
 //
-//  CRF++ -- Yet Another CRF toolkit
+//  CRF++PIVAJ -- A CRF toolkit derived from CRF++ for 
+//  the PIVAJ project (see http://plair.univ-rouen.fr).
 //
-//  $Id: encoder.cpp 1601 2007-03-31 09:47:18Z taku $;
 //
+//  Copyright(C) 2014 Julien Lerouge <julien@lerouge.me>
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
 #ifdef HAVE_UNISTD_H

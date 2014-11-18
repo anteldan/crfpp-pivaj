@@ -1,5 +1,6 @@
 /*
-  CRF++ -- Yet Another CRF toolkit
+  CRF++PIVAJ -- A CRF toolkit derived from CRF++ for 
+//  the PIVAJ project (see http://plair.univ-rouen.fr).
 
   $Id: crfpp.h 1592 2007-02-12 09:40:53Z taku $;
 

@@ -1,8 +1,9 @@
 //
-//  CRF++ -- Yet Another CRF toolkit
+//  CRF++PIVAJ -- A CRF toolkit derived from CRF++ for 
+//  the PIVAJ project (see http://plair.univ-rouen.fr).
 //
-//  $Id: common.h 1588 2007-02-12 09:03:39Z taku $;
 //
+//  Copyright(C) 2014 Julien Lerouge <julien@lerouge.me>
 //  Copyright(C) 2005-2007 Taku Kudo <taku@chasen.org>
 //
 #ifndef CRFPP_COMMON_H_
@@ -26,8 +27,8 @@
 #include "config.h"
 #endif
 
-#define COPYRIGHT  "CRF++: Yet Another CRF Tool Kit\nCopyright (C) "    \
-  "2005-2013 Taku Kudo, All rights reserved.\n"
+#define COPYRIGHT  "CRF++-PIVAJ: A CRF toolkit derived from CRF++\nCopyright (C) "    \
+  "2014 Julien Lerouge\nCopyright (C) 2005-2013 Taku Kudo\nAll rights reserved.\n"
 #define MODEL_VERSION 100
 
 #if defined(_WIN32) && !defined(__CYGWIN__)

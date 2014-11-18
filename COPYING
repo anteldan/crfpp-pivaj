@@ -1,3 +1,13 @@
-CRF++ is copyrighted free software by Taku Kudo <taku@chasen.org>,
-and is released under any of the LGPL (see the file LGPL) or the
-BSD License (see the file BSD).
+Copyright (c) 2014, Julien Lerouge <julien@lerouge.me>
+Copyright (c) 2005-2013, Taku Kudo <taku@chasen.org>
+All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of either the GNU Lesser General Public License
+version 3, as published by the Free Software Foundation (see
+COPYING.LGPL), or the BSD 3-Clause License (see COPYING.BSD).
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
