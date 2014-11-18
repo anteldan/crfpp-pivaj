@@ -1,4 +1,4 @@
-EXTRA_DIST = README Makefile.msvc.in merge-models.pl
+EXTRA_DIST = README.md Makefile.msvc.in merge-models.pl
 EXTRA_DIRS = doc example sdk perl python ruby java swig
 bin_PROGRAMS = crf_learn crf_test
 ACLOCAL_AMFLAGS = -I m4
@@ -39,7 +39,7 @@ win-dist:
 #	cp -f sdk/model @PACKAGE@-@VERSION@/sdk
 	cp -f sdk/example.cpp @PACKAGE@-@VERSION@/sdk	
 	cp -fr doc/*.html doc/*.css doc/doxygen @PACKAGE@-@VERSION@/doc
-	cp -f README COPYING AUTHORS LGPL BSD @PACKAGE@-@VERSION@
+	cp -f README.md COPYING AUTHORS COPYING.LGPL COPYING.BSD @PACKAGE@-@VERSION@
 	cp -fr example/* @PACKAGE@-@VERSION@/example
 	find @PACKAGE@-@VERSION@ -name CVS | xargs rm -rf
 	find @PACKAGE@-@VERSION@ -name .svn | xargs rm -rf	
