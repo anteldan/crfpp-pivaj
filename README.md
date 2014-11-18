@@ -1,5 +1,4 @@
 #CRF++-PIVAJ
-=====
 
 This project is a fork of original [CRF++][http://crfpp.googlecode.com/svn/trunk/doc/index.html] software by Taku Kudo :
 "CRF++ is a simple, customizable, and open source implementation of Conditional Random Fields (CRFs) for segmenting/labeling sequential data. CRF++ is designed for generic purpose and will be applied to a variety of NLP tasks, such as Named Entity Recognition, Information Extraction and Text Chunking."
