@@ -7,7 +7,9 @@ My modifications aim at providing a better C++ API for the [PIVAJ](http://plair.
 
 ## Copyright
 Copyright (c) 2014, Julien Lerouge
+
 Copyright (c) 2005-2007, Taku Kudo
+
 All rights reserved.
 
 ## License
