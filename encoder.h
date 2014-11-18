@@ -23,8 +23,8 @@ class EncoderImpl : public Encoder {
 
    bool configure(const char* arg);
   
-   bool learn(const char *trainfile,
-              const char *templfile,
+   bool learn(const char *templfile,
+              const char *trainfile,
               const char *modelfile);
 //  bool learn(const char *, const char *,
 //             const char *,
@@ -36,15 +36,18 @@ class EncoderImpl : public Encoder {
    bool convert(const char *text_file,
                 const char* binary_file);
    
+   const char* what() { return what_.str(); }
+  
  private:
-    bool textmodelfile_;
-    size_t maxitr_;
+    bool textmodel_;
+    size_t maxiter_;
     size_t freq_;
     double eta_;
     double C_;
     unsigned short thread_num_;
     unsigned short shrinking_size_;
     int algorithm_;
+    whatlog what_;
 };
 }
 #endif

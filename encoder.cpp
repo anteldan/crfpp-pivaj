@@ -309,39 +309,18 @@ bool EncoderImpl::configure(const Param &param) {
 
   algorithm_ = CRFPP::Encoder::MIRA;
   if (salgo == "crf" || salgo == "crf-l2") {
-    algorithm = CRFPP::Encoder::CRF_L2;
+    algorithm_ = CRFPP::Encoder::CRF_L2;
   } else if (salgo == "crf-l1") {
-    algorithm = CRFPP::Encoder::CRF_L1;
+    algorithm_ = CRFPP::Encoder::CRF_L1;
   } else if (salgo == "mira") {
-    algorithm = CRFPP::Encoder::MIRA;
+    algorithm_ = CRFPP::Encoder::MIRA;
   } else {
     CHECK_FALSE(false) << "unknown algorithm: " << salgo;
   }
   return true;
 }
 
-bool EncoderImpl::configure(int argc,  char** argv) {
-  Param param;
-  CHECK_FALSE(param.open(argc, argv, CRFPP::long_options)) << param.what();
-  return open(param);
-}
-
-bool EncoderImpl::configure(const char* arg) {
-  Param param;
-  CHECK_FALSE(param.open(arg, CRFPP::long_options)) << param.what();
-  return open(param);
-}
-
-//bool textmodelfile,
-//size_t maxitr,
-//size_t freq,
-//double eta,
-//double C,
-//unsigned short thread_num,
-//unsigned short shrinking_size,
-//int algorithm
-
-bool EncoderImpl::learn(const char *trainfile, const char *templfile, const char *modelfile) {
+bool EncoderImpl::learn(const char *templfile, const char *trainfile, const char *modelfile) {
   std::cout << COPYRIGHT << std::endl;
 
   CHECK_FALSE(eta_ > 0.0) << "eta must be > 0.0";
@@ -371,7 +350,11 @@ bool EncoderImpl::learn(const char *trainfile, const char *templfile, const char
     std::cerr << msg << std::endl;                              \
     return false; } while (0)
 
-  CHECK_FALSE(feature_index.open(templfile, trainfile))
+    std::cout << "train : " <<  trainfile << std::endl;
+    std::cout << "template : " <<  templfile << std::endl;
+    std::cout << "model : " <<  modelfile << std::endl;
+
+    CHECK_FALSE(feature_index.open(templfile, trainfile))
       << feature_index.what();
 
   {
@@ -427,19 +410,19 @@ bool EncoderImpl::learn(const char *trainfile, const char *templfile, const char
   switch (algorithm_) {
     case MIRA:
       if (!runMIRA(x, &feature_index, &alpha[0],
-                   maxitr_, C, eta_, shrinking_size_, thread_num_)) {
+                   maxiter_, C_, eta_, shrinking_size_, thread_num_)) {
         WHAT_ERROR("MIRA execute error");
       }
       break;
     case CRF_L2:
       if (!runCRF(x, &feature_index, &alpha[0],
-                  maxitr_, C, eta_, shrinking_size_, thread_num_, false)) {
+                  maxiter_, C_, eta_, shrinking_size_, thread_num_, false)) {
         WHAT_ERROR("CRF_L2 execute error");
       }
       break;
     case CRF_L1:
       if (!runCRF(x, &feature_index, &alpha[0],
-                  maxitr_, C, eta_, shrinking_size_, thread_num_, true)) {
+                  maxiter_, C_, eta_, shrinking_size_, thread_num_, true)) {
         WHAT_ERROR("CRF_L1 execute error");
       }
       break;
@@ -450,7 +433,7 @@ bool EncoderImpl::learn(const char *trainfile, const char *templfile, const char
     delete *it;
   }
 
-  if (!feature_index.save(modelfile, textmodelfile)) {
+  if (!feature_index.save(modelfile, textmodel_)) {
     WHAT_ERROR(feature_index.what());
   }
 
@@ -491,7 +474,7 @@ int crfpp_learn(const Param &param) {
 
   const std::vector<std::string> &rest = param.rest_args();
   const bool convert = param.get<bool>("convert");
-  if (convert && rest.size() != 2) || (!convert && rest.size() != 3)) {
+  if ((convert && rest.size() != 2) || (!convert && rest.size() != 3)) {
     std::cout << param.help();
     return 0;
   }
@@ -517,12 +500,23 @@ int crfpp_learn(const Param &param) {
   return 0;
 }
 }  // namespace
-}  // CRFPP
+
+bool EncoderImpl::configure(int argc,  char** argv) {
+  Param param;
+  CHECK_FALSE(param.open(argc, argv, long_options)) << param.what();
+  return configure(param);
+}
+
+bool EncoderImpl::configure(const char* arg) {
+  Param param;
+  CHECK_FALSE(param.open(arg, long_options)) << param.what();
+  return configure(param);
+}
 
 Encoder *createEncoder(int argc, char **argv) {
   EncoderImpl *encoder = new EncoderImpl();
   if (!encoder->configure(argc, argv)) {
-    setGlobalError(encoder->what());
+    std::cerr << encoder->what() << std::endl;
     delete encoder;
     return 0;
   }
@@ -532,12 +526,14 @@ Encoder *createEncoder(int argc, char **argv) {
 Encoder *createEncoder(const char *argv) {
   EncoderImpl *encoder = new EncoderImpl();
   if (!encoder->configure(argv)) {
-    setGlobalError(encoder->what());
+    std::cerr << encoder->what() << std::endl;
     delete encoder;
     return 0;
   }
   return encoder;
 }
+
+}  // CRFPP
 
 int crfpp_learn2(const char *argv) {
   CRFPP::Param param;

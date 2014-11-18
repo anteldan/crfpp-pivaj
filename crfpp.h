@@ -353,22 +353,19 @@ class CRFPP_DLL_CLASS_EXTERN Encoder {
   // e.g. arg = "-f 20 -m";
   virtual bool configure(const char* arg) = 0;
   
-  virtual bool learn() = 0;
-    //  virtual bool learn(const char *, const char *,
-    //                     const char *,
-    //                     bool, size_t, size_t,
-    //                     double, double,
-    //                     unsigned short,
-    //                     unsigned short, int) = 0;
+  // learns a model
+  virtual bool learn(const char *,
+                     const char *,
+                     const char *) = 0;
 
   // convert a text model to a binary model
   virtual bool convert(const char *text_file,
                        const char* binary_file) = 0;
-
-  const char* what() { return what_.str(); }
-
- //protected:
-  whatlog what_;
+                       
+  // return internal error code as string
+  virtual const char* what() = 0;
+  
+  virtual ~Encoder() {}
 };
 
 /* factory method */

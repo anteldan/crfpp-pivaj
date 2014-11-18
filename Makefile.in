@@ -38,11 +38,11 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = crf_learn$(EXEEXT) crf_test$(EXEEXT)
 subdir = .
-DIST_COMMON = README $(am__configure_deps) $(include_HEADERS) \
+DIST_COMMON = README.md $(am__configure_deps) $(include_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.msvc.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure $(top_srcdir)/swig/version.h.in \
-	AUTHORS COPYING ChangeLog INSTALL NEWS config.guess config.sub \
+	AUTHORS COPYING INSTALL NEWS config.guess config.sub \
 	depcomp install-sh ltmain.sh missing mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -257,7 +257,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_DIST = README Makefile.msvc.in merge-models.pl
+EXTRA_DIST = README.md Makefile.msvc.in merge-models.pl
 EXTRA_DIRS = doc example sdk perl python ruby java swig
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = no-dependencies
@@ -834,7 +834,7 @@ win-dist:
 #	cp -f sdk/model @PACKAGE@-@VERSION@/sdk
 	cp -f sdk/example.cpp @PACKAGE@-@VERSION@/sdk	
 	cp -fr doc/*.html doc/*.css doc/doxygen @PACKAGE@-@VERSION@/doc
-	cp -f README COPYING AUTHORS LGPL BSD @PACKAGE@-@VERSION@
+	cp -f README.md COPYING AUTHORS COPYING.LGPL COPYING.BSD @PACKAGE@-@VERSION@
 	cp -fr example/* @PACKAGE@-@VERSION@/example
 	find @PACKAGE@-@VERSION@ -name CVS | xargs rm -rf
 	find @PACKAGE@-@VERSION@ -name .svn | xargs rm -rf	
