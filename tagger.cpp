@@ -843,13 +843,7 @@ const char *getLastError() {
 
 namespace {
 int crfpp_test(const Param &param) {
-  if (param.get<bool>("version")) {
-    std::cout <<  param.version();
-    return -1;
-  }
-
-  if (param.get<bool>("help")) {
-    std::cout <<  param.help();
+  if (!param.help_version()) {
     return -1;
   }
 

@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include "param.h"
 #include "encoder.h"
 #include "timer.h"
 #include "tagger.h"
@@ -287,7 +286,7 @@ bool runCRF(const std::vector<TaggerImpl* > &x,
   return true;
 }
 
-bool Encoder::convert(const char* textfilename,
+bool EncoderImpl::convert(const char* textfilename,
                       const char *binaryfilename) {
   EncoderFeatureIndex feature_index;
   CHECK_FALSE(feature_index.convert(textfilename, binaryfilename))
@@ -296,36 +295,70 @@ bool Encoder::convert(const char* textfilename,
   return true;
 }
 
-bool Encoder::learn(const char *templfile,
-                    const char *trainfile,
-                    const char *modelfile,
-                    bool textmodelfile,
-                    size_t maxitr,
-                    size_t freq,
-                    double eta,
-                    double C,
-                    unsigned short thread_num,
-                    unsigned short shrinking_size,
-                    int algorithm) {
+bool EncoderImpl::configure(const Param &param) {
+  freq_ = param.get<int>("freq");
+  maxiter_ = param.get<int>("maxiter");
+  C_ = param.get<float>("cost");
+  eta_ = param.get<float>("eta");
+  textmodel_ = param.get<bool>("textmodel");
+  thread_num_ = CRFPP::getThreadSize(param.get<unsigned short>("thread"));
+  shrinking_size_ = param.get<unsigned short>("shrinking-size");
+  std::string salgo = param.get<std::string>("algorithm");
+
+  CRFPP::toLower(&salgo);
+
+  algorithm_ = CRFPP::Encoder::MIRA;
+  if (salgo == "crf" || salgo == "crf-l2") {
+    algorithm = CRFPP::Encoder::CRF_L2;
+  } else if (salgo == "crf-l1") {
+    algorithm = CRFPP::Encoder::CRF_L1;
+  } else if (salgo == "mira") {
+    algorithm = CRFPP::Encoder::MIRA;
+  } else {
+    CHECK_FALSE(false) << "unknown algorithm: " << salgo;
+  }
+  return true;
+}
+
+bool EncoderImpl::configure(int argc,  char** argv) {
+  Param param;
+  CHECK_FALSE(param.open(argc, argv, CRFPP::long_options)) << param.what();
+  return open(param);
+}
+
+bool EncoderImpl::configure(const char* arg) {
+  Param param;
+  CHECK_FALSE(param.open(arg, CRFPP::long_options)) << param.what();
+  return open(param);
+}
+
+//bool textmodelfile,
+//size_t maxitr,
+//size_t freq,
+//double eta,
+//double C,
+//unsigned short thread_num,
+//unsigned short shrinking_size,
+//int algorithm
+
+bool EncoderImpl::learn(const char *trainfile, const char *templfile, const char *modelfile) {
   std::cout << COPYRIGHT << std::endl;
 
-  CHECK_FALSE(eta > 0.0) << "eta must be > 0.0";
-  CHECK_FALSE(C >= 0.0) << "C must be >= 0.0";
-  CHECK_FALSE(shrinking_size >= 1) << "shrinking-size must be >= 1";
-  CHECK_FALSE(thread_num > 0) << "thread must be > 0";
+  CHECK_FALSE(eta_ > 0.0) << "eta must be > 0.0";
+  CHECK_FALSE(C_ >= 0.0) << "C must be >= 0.0";
+  CHECK_FALSE(shrinking_size_ >= 1) << "shrinking-size must be >= 1";
+  CHECK_FALSE(thread_num_ > 0) << "thread must be > 0";
 
 #ifndef CRFPP_USE_THREAD
-  CHECK_FALSE(thread_num == 1)
-      << "This architecture doesn't support multi-thrading";
+  CHECK_FALSE(thread_num_ == 1) << "This architecture doesn't support multi-threading";
 #endif
 
-  if (algorithm == MIRA && thread_num > 1) {
-    std::cerr <<  "MIRA doesn't support multi-thrading. use thread_num=1"
-              << std::endl;
+  if (algorithm_ == MIRA) {
+    CHECK_FALSE(thread_num_ == 1) <<  "MIRA doesn't support multi-threading. use thread_num=1";
   }
 
   EncoderFeatureIndex feature_index;
-  Allocator allocator(thread_num);
+  Allocator allocator(thread_num_);
   std::vector<TaggerImpl* > x;
 
   std::cout.setf(std::ios::fixed, std::ios::floatfield);
@@ -363,7 +396,7 @@ bool Encoder::learn(const char *templfile,
         continue;
       }
 
-      _x->set_thread_id(line % thread_num);
+      _x->set_thread_id(line % thread_num_);
 
       if (++line % 100 == 0) {
         std::cout << line << ".. " << std::flush;
@@ -374,7 +407,7 @@ bool Encoder::learn(const char *templfile,
     std::cout << "\nDone!";
   }
 
-  feature_index.shrink(freq, &allocator);
+  feature_index.shrink(freq_, &allocator);
 
   std::vector <double> alpha(feature_index.size());           // parameter
   std::fill(alpha.begin(), alpha.end(), 0.0);
@@ -382,31 +415,31 @@ bool Encoder::learn(const char *templfile,
 
   std::cout << "Number of sentences: " << x.size() << std::endl;
   std::cout << "Number of features:  " << feature_index.size() << std::endl;
-  std::cout << "Number of thread(s): " << thread_num << std::endl;
-  std::cout << "Freq:                " << freq << std::endl;
-  std::cout << "eta:                 " << eta << std::endl;
-  std::cout << "C:                   " << C << std::endl;
-  std::cout << "shrinking size:      " << shrinking_size
+  std::cout << "Number of thread(s): " << thread_num_ << std::endl;
+  std::cout << "Freq:                " << freq_ << std::endl;
+  std::cout << "eta:                 " << eta_ << std::endl;
+  std::cout << "C:                   " << C_ << std::endl;
+  std::cout << "shrinking size:      " << shrinking_size_
             << std::endl;
 
   progress_timer pg;
 
-  switch (algorithm) {
+  switch (algorithm_) {
     case MIRA:
       if (!runMIRA(x, &feature_index, &alpha[0],
-                   maxitr, C, eta, shrinking_size, thread_num)) {
+                   maxitr_, C, eta_, shrinking_size_, thread_num_)) {
         WHAT_ERROR("MIRA execute error");
       }
       break;
     case CRF_L2:
       if (!runCRF(x, &feature_index, &alpha[0],
-                  maxitr, C, eta, shrinking_size, thread_num, false)) {
+                  maxitr_, C, eta_, shrinking_size_, thread_num_, false)) {
         WHAT_ERROR("CRF_L2 execute error");
       }
       break;
     case CRF_L1:
       if (!runCRF(x, &feature_index, &alpha[0],
-                  maxitr, C, eta, shrinking_size, thread_num, true)) {
+                  maxitr_, C, eta_, shrinking_size_, thread_num_, true)) {
         WHAT_ERROR("CRF_L1 execute error");
       }
       break;
@@ -453,56 +486,29 @@ const CRFPP::Option long_options[] = {
 
 int crfpp_learn(const Param &param) {
   if (!param.help_version()) {
-    return 0;
+    return -1;
   }
 
-  const bool convert = param.get<bool>("convert");
-
   const std::vector<std::string> &rest = param.rest_args();
-  if (param.get<bool>("help") ||
-      (convert && rest.size() != 2) || (!convert && rest.size() != 3)) {
+  const bool convert = param.get<bool>("convert");
+  if (convert && rest.size() != 2) || (!convert && rest.size() != 3)) {
     std::cout << param.help();
     return 0;
   }
 
-  const size_t         freq           = param.get<int>("freq");
-  const size_t         maxiter        = param.get<int>("maxiter");
-  const double         C              = param.get<float>("cost");
-  const double         eta            = param.get<float>("eta");
-  const bool           textmodel      = param.get<bool>("textmodel");
-  const unsigned short thread         =
-      CRFPP::getThreadSize(param.get<unsigned short>("thread"));
-  const unsigned short shrinking_size
-      = param.get<unsigned short>("shrinking-size");
-  std::string salgo = param.get<std::string>("algorithm");
-
-  CRFPP::toLower(&salgo);
-
-  int algorithm = CRFPP::Encoder::MIRA;
-  if (salgo == "crf" || salgo == "crf-l2") {
-    algorithm = CRFPP::Encoder::CRF_L2;
-  } else if (salgo == "crf-l1") {
-    algorithm = CRFPP::Encoder::CRF_L1;
-  } else if (salgo == "mira") {
-    algorithm = CRFPP::Encoder::MIRA;
-  } else {
-    std::cerr << "unknown alogrithm: " << salgo << std::endl;
+  CRFPP::EncoderImpl encoder;
+  if (!encoder.configure(param)) {
+    std::cerr << encoder.what() << std::endl;
     return -1;
   }
-
-  CRFPP::Encoder encoder;
+  
   if (convert) {
     if (!encoder.convert(rest[0].c_str(), rest[1].c_str())) {
       std::cerr << encoder.what() << std::endl;
       return -1;
     }
   } else {
-    if (!encoder.learn(rest[0].c_str(),
-                       rest[1].c_str(),
-                       rest[2].c_str(),
-                       textmodel,
-                       maxiter, freq, eta, C, thread, shrinking_size,
-                       algorithm)) {
+    if (!encoder.learn(rest[0].c_str(), rest[1].c_str(), rest[2].c_str())) {
       std::cerr << encoder.what() << std::endl;
       return -1;
     }
@@ -512,6 +518,26 @@ int crfpp_learn(const Param &param) {
 }
 }  // namespace
 }  // CRFPP
+
+Encoder *createEncoder(int argc, char **argv) {
+  EncoderImpl *encoder = new EncoderImpl();
+  if (!encoder->configure(argc, argv)) {
+    setGlobalError(encoder->what());
+    delete encoder;
+    return 0;
+  }
+  return encoder;
+}
+
+Encoder *createEncoder(const char *argv) {
+  EncoderImpl *encoder = new EncoderImpl();
+  if (!encoder->configure(argv)) {
+    setGlobalError(encoder->what());
+    delete encoder;
+    return 0;
+  }
+  return encoder;
+}
 
 int crfpp_learn2(const char *argv) {
   CRFPP::Param param;

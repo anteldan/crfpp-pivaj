@@ -9,26 +9,42 @@
 #ifndef CRFPP_ENCODER_H_
 #define CRFPP_ENCODER_H_
 
+#include "crfpp.h"
 #include "common.h"
+#include "param.h"
 
 namespace CRFPP {
-class Encoder {
+class EncoderImpl : public Encoder {
  public:
-  enum { CRF_L2, CRF_L1, MIRA };
-  bool learn(const char *, const char *,
-             const char *,
-             bool, size_t, size_t,
-             double, double,
-             unsigned short,
-             unsigned short, int);
+     
+   bool configure(const Param &param);
 
-  bool convert(const char *text_file,
-               const char* binary_file);
+   bool configure(int argc,  char** argv);
 
-  const char* what() { return what_.str(); }
+   bool configure(const char* arg);
+  
+   bool learn(const char *trainfile,
+              const char *templfile,
+              const char *modelfile);
+//  bool learn(const char *, const char *,
+//             const char *,
+//             bool, size_t, size_t,
+//             double, double,
+//             unsigned short,
+//             unsigned short, int);
 
+   bool convert(const char *text_file,
+                const char* binary_file);
+   
  private:
-  whatlog what_;
+    bool textmodelfile_;
+    size_t maxitr_;
+    size_t freq_;
+    double eta_;
+    double C_;
+    unsigned short thread_num_;
+    unsigned short shrinking_size_;
+    int algorithm_;
 };
 }
 #endif

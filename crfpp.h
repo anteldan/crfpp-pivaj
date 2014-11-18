@@ -341,7 +341,45 @@ class CRFPP_DLL_CLASS_EXTERN Tagger {
   virtual ~Tagger() {}
 };
 
+class CRFPP_DLL_CLASS_EXTERN Encoder {
+ public:
+  enum { CRF_L2, CRF_L1, MIRA };
+  
+  // configure the encoder with parameters in argv[]
+  // e.g, argv[] = {"CRF++", "-f", "20", "-m", "1000"};
+  virtual bool configure(int argc,  char** argv) = 0;
+
+  // configure the encoder with parameter arg
+  // e.g. arg = "-f 20 -m";
+  virtual bool configure(const char* arg) = 0;
+  
+  virtual bool learn() = 0;
+    //  virtual bool learn(const char *, const char *,
+    //                     const char *,
+    //                     bool, size_t, size_t,
+    //                     double, double,
+    //                     unsigned short,
+    //                     unsigned short, int) = 0;
+
+  // convert a text model to a binary model
+  virtual bool convert(const char *text_file,
+                       const char* binary_file) = 0;
+
+  const char* what() { return what_.str(); }
+
+ //protected:
+  whatlog what_;
+};
+
 /* factory method */
+
+// create CRFPP::Encoder instance with parameters in argv[]
+// e.g, argv[] = {"CRF++", "-a", "crf", "-m", "1000"};
+CRFPP_DLL_EXTERN Encoder *createEncoder(int argc, char **argv);
+
+// create CRFPP::Encoder instance with parameter in arg
+// e.g. arg = "-a crf -m 1000";
+CRFPP_DLL_EXTERN Encoder *createEncoder(const char *arg);
 
 // create CRFPP::Tagger instance with parameters in argv[]
 // e.g, argv[] = {"CRF++", "-m", "model", "-v3"};
