@@ -6,9 +6,9 @@ This project is a fork of original [CRF++](http://crfpp.googlecode.com/svn/trunk
 My modifications aim at providing a better C++ API for the [PIVAJ](http://plair.univ-rouen.fr/plair/jdr/home) project ("Plateforme d'Indexation et de Visualisation d'Archives de Journaux").
 
 ## Copyright
-Copyright (c) 2014, Julien Lerouge
+Copyright (c) 2014-2015, Julien Lerouge
 
-Copyright (c) 2005-2007, Taku Kudo
+Copyright (c) 2005-2013, Taku Kudo
 
 All rights reserved.
 
